@@ -1,0 +1,59 @@
+version: "3.7"
+
+services:
+  calculate-online-nginx:
+    container_name: calculate-online
+    image: nginx:1.17-alpine
+    volumes:
+      - ./src:/var/www/html:cached
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - "${DOCKER_NGINX}:80"
+    depends_on:
+      - calculate-online-php
+    restart: unless-stopped
+
+  calculate-online-php:
+    container_name: calculate-online-php
+    build:
+      context: ./docker/php
+      dockerfile: php.local.dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/html:cached
+    depends_on:
+      - calculate-online-postgres
+
+  calculate-online-postgres:
+    container_name: calculate-online-postgres
+    image: postgres:13.1-alpine
+    environment:
+      POSTGRES_USER: ${DOCKER_DATABASE_USER}
+      POSTGRES_PASSWORD: ${DOCKER_DATABASE_PASSWORD}
+      POSTGRES_DB: ${DOCKER_DATABASE_DB}
+    volumes:
+      - ../postgres-data:/var/lib/postgresql/data
+    ports:
+      - "${DOCKER_DATABASE_PORT}:5432"
+
+  calculate-online-redis:
+    container_name: calculate-online-redis
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${DOCKER_REDIS_PORT}:6379"
+    restart: unless-stopped
+    command: redis-server --requirepass ${DOCKER_REDIS_PASSWORD}
+
+  calculate-node:
+    container_name: calculate-node
+    image: node
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+
+volumes:
+  composer:
+  ssh_dir: {}
+  redis_data:
