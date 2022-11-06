@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FinanceCalculatorController;
+use App\Http\Controllers\FitnessHealthCalculatorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,3 +22,4 @@ Route::get('/', function () {
 Route::get('/calculator-nds', [FinanceCalculatorController::class, 'nds']);
 Route::get('/calculator-credit', [FinanceCalculatorController::class, 'credit']);
 Route::get('/kreditnyj-kalkulyator-s-dosrochnym-pogasheniem', [FinanceCalculatorController::class, 'creditWithEarlyRepayment']);
+Route::get('/bmi-calculator', [FitnessHealthCalculatorController::class, 'bmi']);
